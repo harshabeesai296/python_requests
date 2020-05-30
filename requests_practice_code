@@ -1,0 +1,181 @@
+# Snippet 1
+
+import requests
+
+'''Similarly we can perform all the HTTP functions like GET, POST, PUT, DELETE, OPTIONS, PATCH & HEAD'''
+r = requests.get('https://api.github.com/events')
+r1 = requests.head('https://api.github.com/events')
+r2 = requests.put('https://httpbin.org/put',data = {'key':'value'})
+r3 = requests.post('https://httpbin.org/post',data = {'key':'value'})
+r4 = requests.options('https://httpbin.org/get')
+r5 = requests.delete('https://httpbin.org/delete')
+
+
+print(r.content)
+print(r.text)
+print(r.url)
+print(r.status_code)
+print(r.cookies)
+
+
+# Snippet 2
+
+import requests
+
+payload1 = {'key1':'value1','key2':'value2'}
+payload2 = {'key3':'value3','key4':['value4','value5']}
+
+r = requests.get('https://httpbin.org/get', params=payload1)
+r1 = requests.get('https://httpbin.org/get',params=payload2 )
+r2 = requests.get('https://api.github.com/events')
+
+print(r.url)
+print(r1.url)
+print(r2.encoding)
+
+
+# Snippet 3
+
+from io import BytesIO
+
+r = requests.get('https://api.github.com/events')
+
+# Byte Response From the server
+print(r.content)
+
+# JSON Response from the server
+print(r.json())
+
+# Raw response from the server
+r1 = requests.get('https://api.github.com/events', stream = True)
+print(r1.raw)
+print(r1.raw.read(10))
+
+# However we need to save the raw content to a file
+
+with open(newfile,'wb') as nf:
+    for chunks in r.iter_content(chunk_size=128):
+        nf.write(chunks)
+
+# r.raw will be useful if we need access to the raw bytes as they were retrieved from server
+# However r.iter_content will be useful if we want automatic decoding of zip and deflate transfer encodings
+
+
+
+# Snippet 4
+
+import json
+import requests
+# More complicated POST methods
+from requests.models import Response
+
+data1 = {'key1':'value1','key2':'value2'}
+r1 = requests.post('https://httpbin.org/post',data = data1 )
+
+tuple_data = [('key1','value1'),('key1','value2')]
+r2 = requests.post('https://httpbin.org/post', data=tuple_data)
+
+dict_data = {'key1':['value1','value2']}
+r3 = requests.post('https://httpbin.org/post', data=dict_data)
+
+print(r1.text)
+print(r2.text)
+print(r3.text)
+
+
+# JSON data can also be sent in the POST and PATCH forms
+url = 'https://api.github.com/some/endpoint'
+payload = {'key1':'value1'}
+r4 = requests.post(url,data=json.dumps(payload))
+r5 = requests.post(url, json=payload)
+
+print(r4.text)
+print(r5.text)
+
+
+
+# Snippet 5
+
+import requests
+import json
+
+url = 'https://httpbin.org/post'
+files = {'file':open('reports.xlsx','rb')}
+
+r = requests.post(url,files=files)
+# We can see only the censored binary data present in the file
+print(r.text)
+
+# Always open the files in Byte mode in Requests and do not ope the files in text mode
+# We can send strings as CSV files to be posted into the page
+
+files1 = {'file',('report.csv','some data, to be sent\n another row to be sent\n')}
+r1 = requests.post(url,files = files1)
+print(r1.text)
+
+
+
+# Snippet 6
+
+import requests
+import json
+
+r = requests.get('https://httpbin.org/get')
+print(r.status_code)
+
+# 200 Status code is considered as Good.
+# 4XX are client errors and 5XX are server errors
+
+bad_r = requests.get('https://httpbin.org/status/404')
+print(bad_r.status_code)
+print(bad_r.raise_for_status())
+print(r.raise_for_status())
+
+
+
+# Snippet 7
+
+import requests
+import json
+
+r = requests.get('https://httpbin.org/get')
+print(r.headers)
+print(r.headers['date'])
+
+url = 'http://example.com/some/cookie/setting/url'
+r1 = requests.get('http://example.com/some/cookie/setting/url')
+print(r1.cookies)
+cookies = dict(cookies_are = 'working')
+r2 = requests.get(url,cookies=cookies)
+print(r2.text)
+
+'''jar = requests.cookies.RequestCookieJar()
+jar.set('tasty','yummm', domain = 'httpbin.org', path = '/cookies')
+url1 = 'https://httpbin.org/cookies'
+r3 = requests.get(url,cookies=jar)
+print(r3.text)'''
+print(r.status_code)
+print(r.history)
+
+r4 = requests.get('http://github.com/',allow_redirects = False)
+print(r4.status_code)
+print(r4.history)
+
+r5 = requests.get('https://github.com/', timeout=0.001)
+
+
+
+'''In the event of a network problem (e.g. DNS failure, refused connection, etc), Requests will raise a ConnectionError exception.
+
+Response.raise_for_status() will raise an HTTPError if the HTTP request returned an unsuccessful status code.
+
+If a request times out, a Timeout exception is raised.
+
+If a request exceeds the configured number of maximum redirections, a TooManyRedirects exception is raised.
+
+All exceptions that Requests explicitly raises inherit from requests.exceptions.RequestException.'''
+
+
+
+
+
